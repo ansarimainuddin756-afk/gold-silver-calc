@@ -1,1 +1,25 @@
 
+{
+  "name": "S J Jewellers — Gold Silver Calculator",
+  "short_name": "S J Jewellers",
+  "description": "Weight, today's rate aur making charge se gold/silver ki price calculate karo.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1610",
+  "theme_color": "#c9a24a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
