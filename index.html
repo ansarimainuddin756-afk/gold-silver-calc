@@ -1,1 +1,544 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S J Jewellers — Gold / Silver Calculator</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c9a24a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a24a;
+    --gold-light: #e8d19a;
+    --silver: #b8bec4;
+    --silver-light: #e6e9eb;
+    --bg-deep: #1a1610;
+    --card: #241f17;
+    --card-edge: #14110b;
+    --ink: #f3ecd9;
+    --ink-dim: #a89d80;
+  }
 
+  * { box-sizing: border-box; }
+
+  html, body {
+    min-height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 0%, #2a2318, var(--bg-deep) 70%);
+    font-family: 'Inter', sans-serif;
+    padding: 24px 12px;
+  }
+
+  .page { width: 320px; }
+
+  .header { text-align: center; margin-bottom: 18px; }
+  .title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+  }
+  .subtitle {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+
+  .card {
+    background: linear-gradient(165deg, var(--card), var(--card-edge));
+    border-radius: 20px;
+    padding: 18px 20px 20px;
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    margin-bottom: 18px;
+  }
+  .card.gold { border: 1px solid rgba(201,162,74,0.3); }
+  .card.silver { border: 1px solid rgba(184,190,196,0.3); }
+
+  .metal-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(255,255,255,0.12);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .gold .dot { background: linear-gradient(160deg, var(--gold-light), var(--gold)); }
+  .gold .metal-label { color: var(--gold-light); }
+  .silver .dot { background: linear-gradient(160deg, var(--silver-light), var(--silver)); }
+  .silver .metal-label { color: var(--silver-light); }
+
+  label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 12px 2px 6px;
+  }
+
+  .input-wrap { position: relative; }
+  .input-wrap span {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    padding: 12px 12px 12px 30px;
+    outline: none;
+    transition: border-color 0.15s ease;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .gold input[type="number"]:focus { border-color: var(--gold); }
+  .silver input[type="number"]:focus { border-color: var(--silver); }
+
+  .result-box {
+    margin-top: 16px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 14px 16px 12px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    padding: 3px 0;
+    font-family: 'Space Mono', monospace;
+  }
+  .row span:last-child { color: var(--ink); }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+  }
+  .total-label {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .total-value { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 22px; }
+  .gold .total-value { color: var(--gold-light); }
+  .silver .total-value { color: var(--silver-light); }
+
+  .grand-total {
+    background: linear-gradient(160deg, #3a2f18, #1f1a10);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border: 1px solid rgba(201,162,74,0.35);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.7);
+  }
+  .grand-total .total-label { color: var(--ink-dim); font-size: 12px; }
+  .grand-total .total-value { color: var(--ink); font-size: 26px; }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .actions button {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: transform 0.06s ease;
+  }
+  .actions button:active { transform: translateY(2px); }
+  .btn-whatsapp { background: #25D366; color: #0b3d1f; }
+  .btn-print { background: #3a3a42; color: #eae7e1; }
+  .actions svg { width: 16px; height: 16px; }
+
+  .weight-row { display: flex; gap: 8px; align-items: stretch; }
+  .weight-row .input-wrap { flex: 1; }
+  .cam-btn {
+    flex-shrink: 0;
+    width: 46px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    color: var(--ink-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .gold .cam-btn:hover { background: rgba(201,162,74,0.25); color: var(--gold-light); }
+  .silver .cam-btn:hover { background: rgba(184,190,196,0.25); color: var(--silver-light); }
+  .cam-btn svg { width: 20px; height: 20px; }
+
+  .ocr-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    flex-direction: column;
+    padding: 16px;
+  }
+  .ocr-overlay.open { display: flex; }
+  .ocr-frame {
+    width: 100%;
+    max-width: 340px;
+    background: #111;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(201,162,74,0.4);
+  }
+  .ocr-frame video, .ocr-frame canvas {
+    width: 100%;
+    display: block;
+  }
+  .ocr-guide {
+    position: absolute;
+    top: 40%;
+    left: 8%;
+    right: 8%;
+    height: 20%;
+    border: 2px dashed var(--gold-light);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .ocr-status {
+    color: var(--ink);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    text-align: center;
+    margin: 14px 0;
+    min-height: 18px;
+  }
+  .ocr-controls { display: flex; gap: 10px; width: 100%; max-width: 340px; }
+  .ocr-controls button {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .ocr-capture { background: linear-gradient(160deg, var(--gold-light), var(--gold)); color: #2b2109; }
+  .ocr-cancel { background: #3a3a42; color: #eae7e1; }
+
+  /* Printer receipt styling */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .header .title, .header .subtitle { color: #000 !important; }
+    .page { width: 280px; }
+    .card, .grand-total {
+      background: #fff !important;
+      box-shadow: none !important;
+      border: 1px solid #000 !important;
+      color: #000 !important;
+    }
+    .metal-label, .row, .row span:last-child, .total-label, .total-value {
+      color: #000 !important;
+    }
+    .result-box { background: #f4f4f4 !important; }
+    input { border: 1px solid #000 !important; background: #fff !important; color: #000 !important; }
+    .actions { display: none !important; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="title">S J Jewellers</div>
+    <div class="subtitle">Gold &amp; Silver Rate Calculator</div>
+  </div>
+
+  <div class="card gold">
+    <div class="metal-label"><span class="dot"></span>Gold</div>
+
+    <label>Weight (grams)</label>
+    <div class="weight-row">
+      <div class="input-wrap">
+        <span>g</span>
+        <input type="number" id="g-weight" placeholder="0.00" step="0.01" oninput="calc()">
+      </div>
+      <button class="cam-btn" onclick="openScanner('g-weight')" title="Scan weighing scale">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+    </div>
+
+    <label>Today's Rate (per gram)</label>
+    <div class="input-wrap">
+      <span>₹</span>
+      <input type="number" id="g-rate" placeholder="0.00" step="0.01" oninput="calc()">
+    </div>
+
+    <label>Making Charge (per gram)</label>
+    <div class="input-wrap">
+      <span>₹</span>
+      <input type="number" id="g-making" placeholder="0.00" step="0.01" oninput="calc()">
+    </div>
+
+    <div class="result-box">
+      <div class="row"><span>Metal value</span><span id="g-metalVal">₹0.00</span></div>
+      <div class="row"><span>Making charge / gram</span><span id="g-makingRate">₹0.00/g</span></div>
+      <div class="row"><span>Making charge (total)</span><span id="g-makingVal">₹0.00</span></div>
+      <div class="total-row">
+        <span class="total-label">Gold Total</span>
+        <span class="total-value" id="g-totalVal">₹0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card silver">
+    <div class="metal-label"><span class="dot"></span>Silver</div>
+
+    <label>Weight (grams)</label>
+    <div class="weight-row">
+      <div class="input-wrap">
+        <span>g</span>
+        <input type="number" id="s-weight" placeholder="0.00" step="0.01" oninput="calc()">
+      </div>
+      <button class="cam-btn" onclick="openScanner('s-weight')" title="Scan weighing scale">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+    </div>
+
+    <label>Today's Rate (per gram)</label>
+    <div class="input-wrap">
+      <span>₹</span>
+      <input type="number" id="s-rate" placeholder="0.00" step="0.01" oninput="calc()">
+    </div>
+
+    <label>Making Charge (per gram)</label>
+    <div class="input-wrap">
+      <span>₹</span>
+      <input type="number" id="s-making" placeholder="0.00" step="0.01" oninput="calc()">
+    </div>
+
+    <div class="result-box">
+      <div class="row"><span>Metal value</span><span id="s-metalVal">₹0.00</span></div>
+      <div class="row"><span>Making charge / gram</span><span id="s-makingRate">₹0.00/g</span></div>
+      <div class="row"><span>Making charge (total)</span><span id="s-makingVal">₹0.00</span></div>
+      <div class="total-row">
+        <span class="total-label">Silver Total</span>
+        <span class="total-value" id="s-totalVal">₹0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grand-total">
+    <span class="total-label">Grand Total</span>
+    <span class="total-value" id="grandTotal">₹0.00</span>
+  </div>
+
+  <div class="actions">
+    <button class="btn-whatsapp" onclick="shareWhatsApp()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.3A8.9 8.9 0 0 0 12 4a8.9 8.9 0 0 0-7.9 12.9L3 21l4.2-1.1A8.9 8.9 0 0 0 12 21a9 9 0 0 0 5.6-14.7zm-5.6 13a7.4 7.4 0 0 1-3.8-1l-.3-.2-2.4.6.6-2.3-.2-.3A7.4 7.4 0 1 1 19.4 12 7.4 7.4 0 0 1 12 19.3zm4-5.5c-.2-.1-1.3-.6-1.5-.7s-.4-.1-.5.1-.6.7-.7.8-.3.2-.5.1a5.8 5.8 0 0 1-2.9-2.6c-.2-.4.2-.4.5-1.3a.4.4 0 0 0 0-.4c-.1-.1-.5-1.2-.7-1.6s-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.8s1.9 2.9 4.6 3.9 1.5.3 2 .3.8-.1 1-.3a.9.9 0 0 0 .3-.9c.1-.3-.4-.5-.6-.6z"/></svg>
+      Share
+    </button>
+    <button class="btn-print" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+      Print
+    </button>
+  </div>
+</div>
+
+<div class="ocr-overlay" id="ocrOverlay">
+  <div class="ocr-frame">
+    <video id="ocrVideo" autoplay playsinline muted></video>
+    <div class="ocr-guide"></div>
+  </div>
+  <div class="ocr-status" id="ocrStatus">Weighing scale ka display frame ke andar rakho</div>
+  <div class="ocr-controls">
+    <button class="ocr-cancel" onclick="closeScanner()">Cancel</button>
+    <button class="ocr-capture" onclick="captureAndRead()">Capture</button>
+  </div>
+</div>
+
+<script>
+  function fmt(n) {
+    return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function val(id) {
+    return parseFloat(document.getElementById(id).value) || 0;
+  }
+
+  function calc() {
+    const gw = val('g-weight'), gr = val('g-rate'), gm = val('g-making');
+    const gMetal = gw * gr;
+    const gMaking = gw * gm;
+    const gTotal = gMetal + gMaking;
+
+    document.getElementById('g-metalVal').textContent = fmt(gMetal);
+    document.getElementById('g-makingRate').textContent = fmt(gm) + '/g';
+    document.getElementById('g-makingVal').textContent = fmt(gMaking);
+    document.getElementById('g-totalVal').textContent = fmt(gTotal);
+
+    const sw = val('s-weight'), sr = val('s-rate'), sm = val('s-making');
+    const sMetal = sw * sr;
+    const sMaking = sw * sm;
+    const sTotal = sMetal + sMaking;
+
+    document.getElementById('s-metalVal').textContent = fmt(sMetal);
+    document.getElementById('s-makingRate').textContent = fmt(sm) + '/g';
+    document.getElementById('s-makingVal').textContent = fmt(sMaking);
+    document.getElementById('s-totalVal').textContent = fmt(sTotal);
+
+    document.getElementById('grandTotal').textContent = fmt(gTotal + sTotal);
+  }
+
+  calc();
+
+  function shareWhatsApp() {
+    const gw = val('g-weight'), gr = val('g-rate'), gm = val('g-making');
+    const gTotal = (gw*gr) + (gw*gm);
+    const sw = val('s-weight'), sr = val('s-rate'), sm = val('s-making');
+    const sTotal = (sw*sr) + (sw*sm);
+    const grand = gTotal + sTotal;
+
+    let msg = "*S J Jewellers*\nGold & Silver Bill\n\n";
+    if (gw > 0) {
+      msg += `*Gold*\nWeight: ${gw} g\nRate: ${fmt(gr)}/g\nMaking: ${fmt(gm)}/g\nTotal: ${fmt(gTotal)}\n\n`;
+    }
+    if (sw > 0) {
+      msg += `*Silver*\nWeight: ${sw} g\nRate: ${fmt(sr)}/g\nMaking: ${fmt(sm)}/g\nTotal: ${fmt(sTotal)}\n\n`;
+    }
+    msg += `*Grand Total: ${fmt(grand)}*`;
+
+    const url = "https://wa.me/?text=" + encodeURIComponent(msg);
+    window.open(url, "_blank");
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+
+  // --- Weighing scale camera scanner ---
+  let ocrStream = null;
+  let ocrTargetId = null;
+
+  async function openScanner(targetId) {
+    ocrTargetId = targetId;
+    const overlay = document.getElementById('ocrOverlay');
+    const video = document.getElementById('ocrVideo');
+    const status = document.getElementById('ocrStatus');
+    status.textContent = "Weighing scale ka display frame ke andar rakho";
+    overlay.classList.add('open');
+
+    try {
+      ocrStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+      });
+      video.srcObject = ocrStream;
+    } catch (err) {
+      status.textContent = "Camera access nahi mila. Permission check karo.";
+    }
+  }
+
+  function closeScanner() {
+    const overlay = document.getElementById('ocrOverlay');
+    overlay.classList.remove('open');
+    if (ocrStream) {
+      ocrStream.getTracks().forEach(t => t.stop());
+      ocrStream = null;
+    }
+  }
+
+  async function captureAndRead() {
+    const video = document.getElementById('ocrVideo');
+    const status = document.getElementById('ocrStatus');
+    if (!video.videoWidth) return;
+
+    // Crop to the guide box area (roughly middle strip) for better accuracy
+    const canvas = document.createElement('canvas');
+    const cropYStart = video.videoHeight * 0.40;
+    const cropHeight = video.videoHeight * 0.20;
+    const cropXStart = video.videoWidth * 0.08;
+    const cropWidth = video.videoWidth * 0.84;
+
+    canvas.width = cropWidth;
+    canvas.height = cropHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, cropXStart, cropYStart, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+    status.textContent = "Reading... ⏳";
+
+    try {
+      const result = await Tesseract.recognize(canvas, 'eng', {
+        tessedit_char_whitelist: '0123456789.'
+      });
+      const text = result.data.text || "";
+      const match = text.match(/\d+\.?\d*/);
+
+      if (match) {
+        const reading = match[0];
+        document.getElementById(ocrTargetId).value = reading;
+        calc();
+        status.textContent = `Detected: ${reading} g — filled ✓`;
+        setTimeout(closeScanner, 900);
+      } else {
+        status.textContent = "Number clear nahi mila, phir se try karo.";
+      }
+    } catch (err) {
+      status.textContent = "Reading fail hui, phir se try karo.";
+    }
+  }
+</script>
+
+</body>
+</html>
